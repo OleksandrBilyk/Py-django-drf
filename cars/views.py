@@ -2,13 +2,13 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from cars.models import CarModel
-from cars.serializers import CarSerializer
+from cars.serializers import CarSerializer, CarListSerializer
 from rest_framework import status
 
 class CarListCreateView(APIView):
     def get(self, *args, **kwargs):
         cars = CarModel.objects.all()
-        serializer = CarSerializer(cars, many=True)
+        serializer = CarListSerializer(cars, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, *args, **kwargs):

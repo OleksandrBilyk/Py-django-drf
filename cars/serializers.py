@@ -7,7 +7,8 @@ class CarSerializer(serializers.Serializer):
     brand = serializers.CharField(max_length=50)
     price = serializers.IntegerField()
     year = serializers.IntegerField()
-
+    body_type = serializers.CharField(max_length=50)
+    engine = serializers.FloatField()
     def create(self, validated_data):
         car = CarModel.objects.create(**validated_data)
         return car
@@ -18,3 +19,17 @@ class CarSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+class CarListSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    brand = serializers.CharField(max_length=50)
+    year = serializers.IntegerField()
+
+    def create(self, validated_data):
+        car = CarModel.objects.create(**validated_data)
+        return car
+
+    def update(self, instance, validated_data):
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
