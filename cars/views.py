@@ -1,64 +1,51 @@
-from django.http import Http404
-from rest_framework.views import APIView
+
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404, GenericAPIView
+
 from cars.models import CarModel
 from cars.serializers import CarSerializer, CarListSerializer
 from rest_framework import status
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 
-class CarListCreateView(APIView):
+class CarListCreateView(GenericAPIView):
+    queryset = CarModel.objects.all()
+    serializer_class = CarSerializer
     def get(self, *args, **kwargs):
-        cars = CarModel.objects.all()
-        serializer = CarListSerializer(cars, many=True)
+        qs = self.get_queryset()
+        serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, *args, **kwargs):
         data = self.request.data
-        serializer = CarSerializer(data=data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
 
-class CarRetrieveUpdateDestroyView(APIView):
+class CarRetrieveUpdateDestroyView(GenericAPIView):
+    queryset = CarModel.objects.all()
+    serializer_class = CarSerializer
     def get(self, *args, **kwargs):
-        pk = kwargs['pk']
-        try:
-            car = CarModel.objects.get(pk=pk)
-        except CarModel.DoesNotExist:
-            raise Http404()
-        serializer = CarSerializer(car)
+        car = self.get_object()
+        serializer = self.get_serializer(car)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def put(self, *args, **kwargs):
-        pk = kwargs['pk']
         data = self.request.data
-        try:
-            car = CarModel.objects.get(pk=pk)
-        except CarModel.DoesNotExist:
-            raise Http404()
-        serializer = CarSerializer(car, data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        car = self.get_object()
+        serializer = self.get_serializer(car, data)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
 
     def delete(self, *args, **kwargs):
-        pk = kwargs['pk']
-        try:
-            CarModel.objects.get(pk=pk).delete()
-        except CarModel.DoesNotExist:
-            raise Http404()
+        self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, *args, **kwargs):
-        pk = kwargs['pk']
         data = self.request.data
-        try:
-            car = CarModel.objects.get(pk=pk)
-        except CarModel.DoesNotExist:
-            raise Http404()
-        serializer = CarSerializer(car, data, partial=True)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        car = self.get_object()
+        serializer = self.get_serializer(car, data, partial=True)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status.HTTP_200_OK)
