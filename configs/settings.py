@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.cars',
     'core',
     'apps.auto_parks',
+    'apps.users',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SILENCED_SYSTEM_CHECKS = ['urls.W002']
