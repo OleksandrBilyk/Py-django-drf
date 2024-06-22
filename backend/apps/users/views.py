@@ -27,6 +27,7 @@ class UserListCreateView(ListCreateAPIView):
 
 class UserBlockView(GenericAPIView):
     # queryset = UserModel.objects.all()
+    serializer_class = UserSerializer
     permission_classes = (IsAdminUser,)
 
     def get_queryset(self):
@@ -41,6 +42,7 @@ class UserBlockView(GenericAPIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class UserUnBlockView(GenericAPIView):
+    serializer_class = UserSerializer
     # queryset = UserModel.objects.all()
     permission_classes = (IsAdminUser,)
 
@@ -70,7 +72,11 @@ class UserAddAvatarView(UpdateAPIView):
 
 
 class TestEmailView(GenericAPIView):
-    permission_classes = (AllowAny, )
+    # permission_classes = (AllowAny, )
+
+    def get_serializer(self, *args, **kwargs):
+        pass
+
     def get(self, *args, **kwargs):
         template = get_template('test_email.html')
         html_content = template.render({'user': 'MAX'})
